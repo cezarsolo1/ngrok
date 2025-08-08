@@ -1,30 +1,26 @@
-// server.js
-import express from "express";
-import bodyParser from "body-parser";
+import 'dotenv/config';
+import express from 'express';
 
 const app = express();
-const PORT = 3000;
-const VERIFY_TOKEN = "my-secret-token";
+app.use(express.json());
 
-app.use(bodyParser.json());
+const port = process.env.PORT || 3000;
+const VERIFY_TOKEN = process.env.VERIFY_TOKEN || 'dev-token';
 
-// Verification endpoint
-app.get("/webhook", (req, res) => {
-  const mode = req.query["hub.mode"];
-  const token = req.query["hub.verify_token"];
-  const challenge = req.query["hub.challenge"];
-
-  if (mode && token && mode === "subscribe" && token === VERIFY_TOKEN) {
-    res.status(200).send(challenge);
-  } else {
-    res.sendStatus(403);
-  }
+app.get('/webhook', (req, res) => {
+  const mode = req.query['hub.mode'];
+  const token = req.query['hub.verify_token'];
+  const challenge = req.query['hub.challenge'];
+  if (mode === 'subscribe' && token === VERIFY_TOKEN) return res.status(200).send(challenge);
+  return res.status(403).send('Verification failed');
 });
 
-// Handle incoming messages
-app.post("/webhook", (req, res) => {
-  console.log("📩 Webhook Event:", JSON.stringify(req.body, null, 2));
+app.post('/webhook', (req, res) => {
+  console.log('📩', JSON.stringify(req.body, null, 2));
   res.sendStatus(200);
 });
 
-app.listen(PORT, () => console.log(`🚀 Webhook listening on port ${PORT}`));
+// (optional) simple health check
+app.get('/', (_req, res) => res.send('OK'));
+
+app.listen(port, () => console.log(`🚀 Webhook listening on port ${port}`));
