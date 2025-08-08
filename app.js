@@ -7,6 +7,9 @@ app.use(express.json());
 const verifyToken = process.env.VERIFY_TOKEN || "my-secret-token";
 const port = process.env.PORT || 3000;
 
+console.log(`🔍 VERIFY_TOKEN length: ${verifyToken.length}`);
+
+
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
