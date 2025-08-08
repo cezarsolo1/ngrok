@@ -1,15 +1,12 @@
-// Load .env for local testing
-require('dotenv').config();
-const express = require('express');
+import 'dotenv/config';
+import express from 'express';
 
 const app = express();
 app.use(express.json());
 
-// Use env var if set, otherwise fallback
 const verifyToken = process.env.VERIFY_TOKEN || "my-secret-token";
 const port = process.env.PORT || 3000;
 
-// GET: Webhook verification
 app.get('/webhook', (req, res) => {
   const mode = req.query['hub.mode'];
   const token = req.query['hub.verify_token'];
@@ -23,15 +20,13 @@ app.get('/webhook', (req, res) => {
   }
 });
 
-// POST: Handle webhook events
 app.post('/webhook', (req, res) => {
   console.log(`📩 Webhook received at ${new Date().toISOString()}`);
   console.log(JSON.stringify(req.body, null, 2));
   res.sendStatus(200);
 });
 
-// Simple health check
-app.get('/', (req, res) => res.send('OK'));
+app.get('/', (_req, res) => res.send('OK'));
 
 app.listen(port, () => {
   console.log(`🚀 Webhook listening on port ${port}`);
